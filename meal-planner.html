@@ -224,6 +224,7 @@
   .mtype-breakfast { background: var(--amber-bg); color: var(--amber); }
   .mtype-lunch     { background: var(--blue-bg);  color: var(--blue); }
   .mtype-dinner    { background: var(--purple-bg); color: var(--purple); }
+  .mtype-snack     { background: var(--green-bg);  color: var(--green); }
   .time-quick      { background: var(--green-bg);  color: var(--forest-600); }
   .time-medium     { background: var(--amber-bg);  color: var(--amber); }
   .time-slow       { background: var(--red-bg);    color: var(--red); }
@@ -331,6 +332,7 @@
   .slot-label.breakfast { color: var(--amber); }
   .slot-label.lunch     { color: var(--blue); }
   .slot-label.dinner    { color: var(--purple); }
+  .slot-label.snack     { color: var(--forest-600); }
   .day-meal-select {
     font-size: 0.78rem; border: 1px solid var(--line);
     border-radius: var(--r1); padding: 6px 8px; background: var(--parch-50);
@@ -341,6 +343,7 @@
   .day-meal-select.slot-breakfast { border-left: 3px solid var(--amber); }
   .day-meal-select.slot-lunch     { border-left: 3px solid var(--blue); }
   .day-meal-select.slot-dinner    { border-left: 3px solid var(--purple); }
+  .day-meal-select.slot-snack     { border-left: 3px solid var(--forest-400); }
   .planner-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
   .day-note-input {
     width: 100%; margin-top: 8px; padding: 6px 8px;
@@ -582,6 +585,7 @@
           <button class="filter-btn" onclick="setFilter('type','breakfast',this)">B</button>
           <button class="filter-btn" onclick="setFilter('type','lunch',this)">L</button>
           <button class="filter-btn" onclick="setFilter('type','dinner',this)">D</button>
+          <button class="filter-btn" onclick="setFilter('type','snack',this)">S</button>
         </div>
       </div>
       <div style="width:1px;background:var(--line);flex-shrink:0"></div>
@@ -670,6 +674,7 @@
             <option value="breakfast">Breakfast</option>
             <option value="lunch">Lunch</option>
             <option value="dinner">Dinner</option>
+            <option value="snack">Snack</option>
           </select>
         </div>
         <div class="form-group">
@@ -745,6 +750,7 @@
         <option value="breakfast">Breakfast</option>
         <option value="lunch">Lunch</option>
         <option value="dinner">Dinner</option>
+        <option value="snack">Snack</option>
       </select>
       <select onchange="setLibFilter('time',this.value,this)" style="font-size:0.8rem;padding:8px 14px;border:1px solid var(--line);border-radius:100px;background:var(--surface);color:var(--ink);outline:none;font-family:'Inter',sans-serif;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%239E9B94%22/></svg>');background-repeat:no-repeat;background-position:right 10px center;padding-right:28px">
         <option value="all">All times</option>
@@ -785,6 +791,7 @@
           <option value="breakfast">Breakfast</option>
           <option value="lunch">Lunch</option>
           <option value="dinner">Dinner</option>
+          <option value="snack">Snack</option>
         </select>
         <select id="ref-time-filter" onchange="renderReference()" style="font-size:0.8rem;padding:6px 10px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2);outline:none">
           <option value="all">All times</option>
@@ -1284,6 +1291,7 @@
           <option value="dinner">Dinner</option>
           <option value="lunch">Lunch</option>
           <option value="breakfast">Breakfast</option>
+          <option value="snack">Snack</option>
         </select>
       </div>
       <div class="form-group">
@@ -1381,6 +1389,7 @@
               <option value="dinner">Dinner</option>
               <option value="lunch">Lunch</option>
               <option value="breakfast">Breakfast</option>
+              <option value="snack">Snack</option>
             </select>
           </div>
           <div>
@@ -1459,7 +1468,7 @@
 <script>
 // ═══════════════════════════════════════════
 const DAYS = ['Friday','Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday'];
-const MEAL_TYPES = ['breakfast','lunch','dinner'];
+const MEAL_TYPES = ['breakfast','lunch','dinner','snack'];
 const UNITS = ['g','kg','ml','l','tsp','tbsp','cup','piece(s)','portion(s)','pack(s)','tin(s)','bag(s)','bunch','handful','pinch','slice(s)','sheet(s)',''];
 const SLOT_ICONS = { breakfast:'', lunch:'', dinner:'' };
 
@@ -1479,7 +1488,8 @@ function toTitleCase(str) {
 // ═══════════════════════════════════════════
 // weekPlan shape: { Friday: { breakfast: id, lunch: id, dinner: id }, ... }
 let meals        = JSON.parse(localStorage.getItem('mp_meals')     || '[]');
-let weekPlan     = JSON.parse(localStorage.getItem('mp_week')      || '{}');
+let weekPlan       = JSON.parse(localStorage.getItem('mp_week')        || '{}');
+let weekPlanServes = JSON.parse(localStorage.getItem('mp_week_serves') || '{}');
 let shoppingTicked = JSON.parse(localStorage.getItem('mp_ticked') || '{}');
 let staples      = JSON.parse(localStorage.getItem('mp_staples')   || '[]');
 let weeklyExtras = JSON.parse(localStorage.getItem('mp_extras')    || '[]');
@@ -1502,8 +1512,8 @@ let dayNotes     = JSON.parse(localStorage.getItem('mp_day_notes')     || '{}');
 // ═══════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════
-const mTypeLabel = t => ({ breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner' }[t] || t);
-const mTypeClass = t => ({ breakfast:'mtype-breakfast', lunch:'mtype-lunch', dinner:'mtype-dinner' }[t] || '');
+const mTypeLabel = t => ({ breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner', snack:'Snack' }[t] || t);
+const mTypeClass = t => ({ breakfast:'mtype-breakfast', lunch:'mtype-lunch', dinner:'mtype-dinner', snack:'mtype-snack' }[t] || '');
 const timeLabel  = t => ({ quick:'Quick', medium:'Medium', slow:'Slow' }[t] || '');
 const timeClass  = t => ({ quick:'time-quick', medium:'time-medium', slow:'time-slow' }[t] || 'time-medium');
 
@@ -1594,7 +1604,8 @@ function setAisleOverride(name, aisleId) {
 function persist() {
   try {
     localStorage.setItem('mp_meals',   JSON.stringify(meals));
-    localStorage.setItem('mp_week',    JSON.stringify(weekPlan));
+    localStorage.setItem('mp_week',        JSON.stringify(weekPlan));
+    localStorage.setItem('mp_week_serves', JSON.stringify(weekPlanServes));
     localStorage.setItem('mp_ticked',  JSON.stringify(shoppingTicked));
     localStorage.setItem('mp_staples', JSON.stringify(staples));
     localStorage.setItem('mp_extras',  JSON.stringify(weeklyExtras));
@@ -1652,7 +1663,7 @@ async function extractRecipe() {
   const hSize = typeof householdSize !== 'undefined' ? householdSize : 2;
   const prompt = `Extract this recipe and reply with ONLY a raw JSON object — no markdown, no backticks, no explanation. Use exactly this structure:
 {"name":"","type":"dinner","cooktime":"medium","serves":"4","season":"all","tags":[],"notes":"","ingredients":[{"name":"","qty":"","unit":""}]}
-type must be: breakfast, lunch, or dinner
+type must be: breakfast, lunch, dinner, or snack
 cooktime must be: quick (under 30min), medium (30-60min), or slow (over 1hr)
 season must be: all, spring, summer, autumn, or winter
 units must be one of: g kg ml l tsp tbsp cup piece(s) portion(s) pack(s) tin(s) bag(s) bunch handful pinch slice(s) sheet(s) or empty string
@@ -1722,7 +1733,7 @@ function sendRecipeToChat() {
   if (!text) { document.getElementById('import-status').textContent = 'Please paste or type a recipe first'; return; }
 
   const prompt = `Please extract this recipe and return ONLY a JSON object with no markdown or backticks. Use exactly these fields:
-{ "name": string, "type": "breakfast"|"lunch"|"dinner", "cooktime": "quick"|"medium"|"slow", "serves": string, "season": "all"|"spring"|"summer"|"autumn"|"winter", "tags": string[], "notes": string, "ingredients": [{"name": string, "qty": string, "unit": string}] }
+{ "name": string, "type": "breakfast"|"lunch"|"dinner"|"snack", "cooktime": "quick"|"medium"|"slow", "serves": string, "season": "all"|"spring"|"summer"|"autumn"|"winter", "tags": string[], "notes": string, "ingredients": [{"name": string, "qty": string, "unit": string}] }
 Units must be: g, kg, ml, l, tsp, tbsp, cup, piece(s), portion(s), pack(s), tin(s), bag(s), bunch, handful, pinch, slice(s), sheet(s), or "". Convert to metric.
 
 Recipe:
@@ -2281,7 +2292,7 @@ function autoBackup(silent = false) {
   const backup = {
     version: 1,
     exported: new Date().toISOString(),
-    meals, weekPlan, staples, weeklyExtras, userCats, userAisles, aisleOverrides, mealUsage, weekHistory, dayTemplates, dayNotes, householdSize,
+    meals, weekPlan, weekPlanServes, staples, weeklyExtras, userCats, userAisles, aisleOverrides, mealUsage, weekHistory, dayTemplates, dayNotes, householdSize,
   };
   const text = JSON.stringify(backup, null, 2);
   const date = new Date().toISOString().slice(0,10);
@@ -2352,6 +2363,7 @@ function resetUsageData() {
   // Clear everything in localStorage directly
   localStorage.setItem('mp_week_history', '[]');
   localStorage.setItem('mp_week',         '{}');
+  localStorage.setItem('mp_week_serves',  '{}');
   localStorage.setItem('mp_usage',        '{}');
   localStorage.setItem('mp_ticked',       '{}');
   localStorage.removeItem('mp_current_week_key');
@@ -2425,6 +2437,7 @@ function restoreData() {
     if (backup.weekHistory)  weekHistory  = backup.weekHistory;
     if (backup.dayTemplates) dayTemplates = backup.dayTemplates;
     if (backup.dayNotes)       dayNotes       = backup.dayNotes;
+    if (backup.weekPlanServes) weekPlanServes = backup.weekPlanServes;
     if (backup.aisleOverrides) { aisleOverrides = backup.aisleOverrides; localStorage.setItem('mp_aisle_ov', JSON.stringify(aisleOverrides)); }
     if (backup.householdSize) { householdSize = backup.householdSize; localStorage.setItem('mp_household_size', householdSize); }
     persist();
@@ -2860,8 +2873,8 @@ function renderReference() {
   emptyEl.style.display = 'none';
   countEl.textContent = `${list.length} of ${meals.length} meals`;
 
-  const TYPE_LABELS  = { breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner' };
-  const TYPE_COLOURS = { breakfast:{ bg:'#FEF3C7', fg:'#B45309' }, lunch:{ bg:'#EFF6FF', fg:'#1D4ED8' }, dinner:{ bg:'#F5F3FF', fg:'#6D28D9' } };
+  const TYPE_LABELS  = { breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner', snack:'Snack' };
+  const TYPE_COLOURS = { breakfast:{ bg:'#FEF3C7', fg:'#B45309' }, lunch:{ bg:'#EFF6FF', fg:'#1D4ED8' }, dinner:{ bg:'#F5F3FF', fg:'#6D28D9' }, snack:{ bg:'#EEF3EB', fg:'#3A6B30' } };
   const TIME_LABELS  = { quick:'Quick', medium:'Medium', slow:'Slow' };
   const TIME_COLOURS = { quick:'var(--forest-600)', medium:'#B45309', slow:'#B91C1C' };
   const TIME_BG      = { quick:'var(--forest-50)', medium:'#FEF3C7', slow:'#FEF2F2' };
@@ -2877,7 +2890,7 @@ function renderReference() {
           ${(m.tags||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:3px">${(m.tags||[]).map(t=>`<span style="font-size:0.6rem;background:var(--parch-200);color:var(--ink-2);padding:1px 6px;border-radius:100px">${t}</span>`).join('')}</div>` : ''}
         </td>
         <td style="text-align:center">${mealUsage[m.id]?.count > 0 ? `<span style="font-size:0.75rem;font-weight:600;color:var(--forest-600);background:var(--forest-50);padding:2px 8px;border-radius:100px;border:1px solid var(--forest-100)">${mealUsage[m.id].count}×</span>` : '<span style="color:var(--ink-3);font-size:0.75rem">—</span>'}</td>
-        <td><span style="background:${TYPE_COLOURS[m.type||'dinner'].bg};color:${TYPE_COLOURS[m.type||'dinner'].fg};border-radius:100px;padding:2px 9px;font-size:0.65rem;font-weight:600;letter-spacing:0.3px;text-transform:uppercase">${TYPE_LABELS[m.type||'dinner']}</span></td>
+        <td><span style="background:${TYPE_COLOURS[m.type||'dinner']?.bg||'#F5F3FF'};color:${TYPE_COLOURS[m.type||'dinner']?.fg||'#6D28D9'};border-radius:100px;padding:2px 9px;font-size:0.65rem;font-weight:600;letter-spacing:0.3px;text-transform:uppercase">${TYPE_LABELS[m.type||'dinner']||m.type||'Dinner'}</span></td>
         <td><span style="background:${TIME_BG[ct]};color:${TIME_COLOURS[ct]};border-radius:100px;padding:2px 9px;font-size:0.65rem;font-weight:600;letter-spacing:0.3px;text-transform:uppercase;white-space:nowrap">${TIME_LABELS[ct]}</span></td>
         <td>${showCategories ? `<span class="badge" style="${catStyle(m.category||'other')};display:inline-flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:0.3px"><span style="width:7px;height:7px;border-radius:50%;background:${(userCats.find(x=>x.id===(m.category||'other'))||{fg:'#5A5A5A'}).fg};flex-shrink:0;opacity:0.8"></span>${catLabel(m.category||'other')}</span>` : '—'}</td>
         <td style="text-align:center;color:var(--ink-3);font-size:0.82rem">${m.serves||'—'}${m.season && m.season!=='all' ? `<div style="font-size:0.6rem;color:var(--blue)">${m.season}</div>` : ''}</td>
@@ -2939,6 +2952,12 @@ function renderPlanner() {
             ${available.map(m => `<option value="${m.id}" ${selectedId==m.id?'selected':''}>${m.name}${parseInt(m.serves) > householdSize ? ' 🍱' : ''}</option>`).join('')}
             ${filteredOut ? `<option value="${selectedMeal.id}" selected>${selectedMeal.name} ⚠️</option>` : ''}
           </select>
+          ${selectedMeal ? `<div style="display:flex;align-items:center;gap:5px;margin-top:4px">
+            <span style="font-size:0.62rem;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.5px;font-weight:600">Serves</span>
+            <input type="number" min="1" max="20" value="${weekPlanServes?.[day]?.[mtype] || selectedMeal.serves || householdSize}"
+              onchange="setSlotServes('${day}','${mtype}',this.value)"
+              style="width:44px;font-size:0.78rem;padding:2px 5px;border:1px solid var(--line);border-radius:var(--r1);background:var(--parch-50);text-align:center;outline:none;color:var(--ink)">
+          </div>` : ''}
         </div>
       `;
     }).join('');
@@ -2971,10 +2990,29 @@ function renderPlanner() {
 
 function setDayMeal(day, mtype, mealId) {
   if (!weekPlan[day]) weekPlan[day] = {};
-  if (mealId) weekPlan[day][mtype] = parseInt(mealId);
-  else delete weekPlan[day][mtype];
+  if (mealId) {
+    weekPlan[day][mtype] = parseInt(mealId);
+    // Default serves to meal's serves value when first selected
+    const meal = meals.find(m => m.id == parseInt(mealId));
+    if (meal) {
+      if (!weekPlanServes[day]) weekPlanServes[day] = {};
+      weekPlanServes[day][mtype] = parseFloat(meal.serves) || householdSize;
+    }
+  } else {
+    delete weekPlan[day][mtype];
+    if (weekPlanServes[day]) delete weekPlanServes[day][mtype];
+  }
   persist();
   renderPlanner();
+}
+
+function setSlotServes(day, mtype, val) {
+  const serves = Math.max(1, Math.min(20, parseFloat(val) || householdSize));
+  if (!weekPlanServes[day]) weekPlanServes[day] = {};
+  weekPlanServes[day][mtype] = serves;
+  persist();
+  // Invalidate shopping cache so list regenerates with new quantities
+  shoppingCache = { key: null, items: null };
 }
 
 function saveDayNote(day, text) {
@@ -2985,6 +3023,7 @@ function saveDayNote(day, text) {
 
 function clearWeek() {
   weekPlan = {};
+  weekPlanServes = {};
   persist();
   renderPlanner();
 }
@@ -3209,7 +3248,16 @@ function getAllIngredients() {
       if (!id) return;
       const meal = meals.find(m => m.id == id);
       if (!meal) return;
-      meal.ingredients.forEach(ing => raw.push({ ...ing, mealName: meal.name }));
+      // Scale ingredients by serves override if set
+      const slotServes  = weekPlanServes?.[day]?.[mtype];
+      const mealServes  = parseFloat(meal.serves) || householdSize;
+      const scaleFactor = slotServes ? slotServes / mealServes : 1;
+      meal.ingredients.forEach(ing => {
+        const scaledQty = ing.qty && scaleFactor !== 1
+          ? String(+(parseFloat(ing.qty) * scaleFactor).toFixed(2))
+          : ing.qty;
+        raw.push({ ...ing, qty: scaledQty, mealName: meal.name });
+      });
     });
   });
   return raw;
@@ -4023,6 +4071,7 @@ function checkAndArchiveWeek() {
     }
     // Clear for new week
     weekPlan = {};
+    weekPlanServes = {};
     persist();
   }
 
@@ -4102,7 +4151,8 @@ function confirmWelcomeRestore() {
     if (_welcomeBackupData.mealUsage)    mealUsage    = _welcomeBackupData.mealUsage;
     if (_welcomeBackupData.weekHistory)  weekHistory  = _welcomeBackupData.weekHistory;
     if (_welcomeBackupData.dayTemplates) dayTemplates = _welcomeBackupData.dayTemplates;
-    if (_welcomeBackupData.dayNotes)     dayNotes     = _welcomeBackupData.dayNotes;
+    if (_welcomeBackupData.dayNotes)       dayNotes       = _welcomeBackupData.dayNotes;
+    if (_welcomeBackupData.weekPlanServes) weekPlanServes = _welcomeBackupData.weekPlanServes;
     if (_welcomeBackupData.aisleOverrides) { aisleOverrides = _welcomeBackupData.aisleOverrides; localStorage.setItem('mp_aisle_ov', JSON.stringify(aisleOverrides)); }
     if (_welcomeBackupData.householdSize) {
       householdSize = _welcomeBackupData.householdSize;
