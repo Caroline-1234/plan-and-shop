@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan & Shop — Feedback</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parch-50:  #FDFAF4;
+    --parch-100: #F7F1E3;
+    --parch-200: #EDE3CC;
+    --parch-300: #DDD0B0;
+    --forest-50:  #EEF3EB;
+    --forest-100: #D5E3CF;
+    --forest-400: #5E8C52;
+    --forest-600: #3A6B30;
+    --forest-800: #1E4018;
+    --forest-900: #122610;
+    --terra-400: #C96A45;
+    --terra-600: #A84E2D;
+    --slate-400: #9E9B94;
+    --slate-600: #6B6860;
+    --slate-800: #2A2926;
+    --slate-900: #1A1917;
+    --ink:   #1A1917;
+    --ink-2: #6B6860;
+    --ink-3: #9E9B94;
+    --line:  #EDE3CC;
+    --line-2:#DDD0B0;
+    --e1: 0 1px 3px rgba(26,25,23,0.06);
+    --e2: 0 2px 8px rgba(26,25,23,0.08), 0 1px 2px rgba(26,25,23,0.04);
+    --e3: 0 8px 24px rgba(26,25,23,0.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--parch-50);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--forest-900);
+    height: 64px; padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: var(--e3);
+  }
+  header h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.7rem; font-weight: 600; color: var(--parch-100);
+  }
+  .header-sub {
+    font-size: 0.72rem; color: rgba(255,255,255,0.45);
+    letter-spacing: 0.4px; text-transform: uppercase;
+  }
+
+  /* ── MAIN ── */
+  .main { max-width: 760px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── WEEK SELECTOR ── */
+  .week-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 32px; flex-wrap: wrap; gap: 12px;
+  }
+  .week-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; font-weight: 600; color: var(--ink);
+  }
+  .week-nav { display: flex; gap: 6px; }
+  .week-btn {
+    background: var(--parch-100); border: 1px solid var(--line-2);
+    color: var(--ink-2); border-radius: 8px; padding: 7px 14px;
+    font-family: 'Inter', sans-serif; font-size: 0.78rem; font-weight: 500;
+    cursor: pointer; transition: all 0.12s;
+  }
+  .week-btn:hover { border-color: var(--forest-400); color: var(--forest-600); background: var(--forest-50); }
+  .week-btn.active { background: var(--forest-600); color: white; border-color: var(--forest-600); }
+
+  /* ── REMINDER BANNER ── */
+  .reminder-banner {
+    background: var(--forest-50); border: 1px solid var(--forest-100);
+    border-left: 3px solid var(--forest-600);
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .reminder-banner p { font-size: 0.82rem; color: var(--forest-600); font-weight: 500; }
+  .reminder-banner span { font-size: 0.75rem; color: var(--forest-400); }
+
+  /* ── CARD ── */
+  .card {
+    background: white; border: 1px solid var(--line);
+    border-radius: 16px; padding: 26px; margin-bottom: 16px;
+    box-shadow: var(--e1);
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; font-weight: 600; color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .card-desc { font-size: 0.78rem; color: var(--ink-3); margin-bottom: 20px; }
+
+  /* ── RATING STARS ── */
+  .rating-group { margin-bottom: 20px; }
+  .rating-label { font-size: 0.72rem; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .stars { display: flex; gap: 6px; }
+  .star {
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 1px solid var(--line-2); background: var(--parch-50);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; cursor: pointer; transition: all 0.1s;
+    color: var(--line-2); user-select: none;
+  }
+  .star:hover, .star.active { background: var(--terra-400); border-color: var(--terra-400); color: white; }
+  .star.active ~ .star { background: var(--parch-50); border-color: var(--line-2); color: var(--line-2); }
+  .stars:hover .star { background: var(--parch-100); border-color: var(--line-2); color: var(--line-2); }
+  .stars .star:hover, .stars .star:hover ~ .star.active { background: var(--parch-100); }
+  .stars[data-rating="1"] .star:nth-child(-n+1),
+  .stars[data-rating="2"] .star:nth-child(-n+2),
+  .stars[data-rating="3"] .star:nth-child(-n+3),
+  .stars[data-rating="4"] .star:nth-child(-n+4),
+  .stars[data-rating="5"] .star:nth-child(-n+5) { background: var(--terra-400); border-color: var(--terra-400); color: white; }
+
+  /* ── CHIP SELECTOR ── */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip {
+    padding: 6px 14px; border-radius: 100px; border: 1px solid var(--line-2);
+    background: var(--parch-50); font-size: 0.78rem; font-weight: 500;
+    color: var(--ink-2); cursor: pointer; transition: all 0.1s; user-select: none;
+  }
+  .chip:hover { border-color: var(--forest-400); color: var(--forest-600); background: var(--forest-50); }
+  .chip.selected { background: var(--forest-600); border-color: var(--forest-600); color: white; }
+
+  /* ── TEXTAREA ── */
+  .field { margin-top: 16px; }
+  .field label { font-size: 0.68rem; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+  .field textarea, .field input[type=text] {
+    width: 100%; padding: 10px 13px;
+    border: 1px solid var(--line); border-radius: 8px;
+    font-family: 'Inter', sans-serif; font-size: 0.86rem;
+    background: var(--parch-50); color: var(--ink);
+    resize: vertical; min-height: 80px; outline: none;
+    transition: border-color 0.12s, box-shadow 0.12s;
+  }
+  .field input[type=text] { min-height: unset; }
+  .field textarea:focus, .field input[type=text]:focus {
+    border-color: var(--forest-400);
+    box-shadow: 0 0 0 3px rgba(58,107,48,0.1);
+    background: white;
+  }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--line); margin: 20px 0; }
+
+  /* ── SUBMIT ── */
+  .submit-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 28px; align-items: center; }
+  .save-indicator { font-size: 0.76rem; color: var(--forest-400); opacity: 0; transition: opacity 0.3s; }
+  .save-indicator.show { opacity: 1; }
+  .btn-submit {
+    background: var(--forest-600); color: white;
+    border: none; border-radius: 8px; padding: 11px 24px;
+    font-family: 'Inter', sans-serif; font-size: 0.84rem; font-weight: 600;
+    cursor: pointer; transition: all 0.12s; letter-spacing: 0.2px;
+    box-shadow: 0 1px 3px rgba(30,64,24,0.3);
+  }
+  .btn-submit:hover { background: var(--forest-800); }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-export {
+    background: var(--parch-100); color: var(--ink-2);
+    border: 1px solid var(--line-2); border-radius: 8px; padding: 11px 20px;
+    font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 500;
+    cursor: pointer; transition: all 0.12s;
+  }
+  .btn-export:hover { border-color: var(--forest-400); color: var(--forest-600); }
+
+  /* ── HISTORY ── */
+  .history-section { margin-top: 48px; }
+  .history-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; font-weight: 600; color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .history-card {
+    background: white; border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 22px; margin-bottom: 10px; cursor: pointer;
+    transition: box-shadow 0.12s; display: flex; align-items: center; gap: 16px;
+  }
+  .history-card:hover { box-shadow: var(--e2); }
+  .history-week { font-weight: 600; font-size: 0.88rem; flex: 1; }
+  .history-date { font-size: 0.74rem; color: var(--ink-3); }
+  .history-dots { display: flex; gap: 4px; align-items: center; }
+  .h-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--terra-400); }
+  .h-dot.empty { background: var(--line-2); }
+  .history-overall { font-size: 0.78rem; font-weight: 600; color: var(--forest-600); }
+  .no-history { text-align: center; padding: 32px; color: var(--ink-3); font-size: 0.86rem; }
+
+  /* ── SUCCESS TOAST ── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--forest-900); color: var(--parch-100);
+    border-radius: 100px; padding: 12px 24px;
+    font-size: 0.82rem; font-weight: 500; letter-spacing: 0.2px;
+    box-shadow: var(--e3); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Plan & Shop</h1>
+  <span class="header-sub">Weekly Feedback</span>
+</header>
+
+<div class="main">
+
+  <!-- Week navigation -->
+  <div class="week-bar">
+    <div class="week-label" id="week-label">Week of —</div>
+    <div class="week-nav">
+      <button class="week-btn" onclick="changeWeek(-1)">← Previous</button>
+      <button class="week-btn active" onclick="changeWeek(0)">This week</button>
+      <button class="week-btn" onclick="changeWeek(1)">Next →</button>
+    </div>
+  </div>
+
+  <!-- Reminder banner -->
+  <div class="reminder-banner" id="reminder-banner">
+    <p id="reminder-text">⏰ Thursday reminder — take 5 minutes to log this week's feedback</p>
+    <span id="reminder-day"></span>
+  </div>
+
+  <!-- Overall experience -->
+  <div class="card">
+    <div class="card-title">Overall experience</div>
+    <div class="card-desc">How did Plan & Shop work for you this week?</div>
+
+    <div class="rating-group">
+      <div class="rating-label">Overall rating</div>
+      <div class="stars" id="stars-overall" data-rating="0" data-key="overall">
+        <div class="star" onclick="setRating('overall',1)">★</div>
+        <div class="star" onclick="setRating('overall',2)">★</div>
+        <div class="star" onclick="setRating('overall',3)">★</div>
+        <div class="star" onclick="setRating('overall',4)">★</div>
+        <div class="star" onclick="setRating('overall',5)">★</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="rating-label" style="margin-bottom:8px">What worked well this week?</div>
+    <div class="chips" id="chips-worked">
+      <div class="chip" onclick="toggleChip(this)">Meal planning</div>
+      <div class="chip" onclick="toggleChip(this)">Shopping list</div>
+      <div class="chip" onclick="toggleChip(this)">Ingredient deduplication</div>
+      <div class="chip" onclick="toggleChip(this)">Staples</div>
+      <div class="chip" onclick="toggleChip(this)">Adding meals</div>
+      <div class="chip" onclick="toggleChip(this)">Paste from recipe</div>
+      <div class="chip" onclick="toggleChip(this)">Printing</div>
+      <div class="chip" onclick="toggleChip(this)">Browse tab</div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="rating-label" style="margin-bottom:8px">What needs improvement?</div>
+    <div class="chips" id="chips-improve">
+      <div class="chip" onclick="toggleChip(this)">Meal planning</div>
+      <div class="chip" onclick="toggleChip(this)">Shopping list</div>
+      <div class="chip" onclick="toggleChip(this)">Ingredient deduplication</div>
+      <div class="chip" onclick="toggleChip(this)">Staples</div>
+      <div class="chip" onclick="toggleChip(this)">Adding meals</div>
+      <div class="chip" onclick="toggleChip(this)">Paste from recipe</div>
+      <div class="chip" onclick="toggleChip(this)">Printing</div>
+      <div class="chip" onclick="toggleChip(this)">Navigation</div>
+      <div class="chip" onclick="toggleChip(this)">Speed</div>
+    </div>
+  </div>
+
+  <!-- Feature ratings -->
+  <div class="card">
+    <div class="card-title">Feature ratings</div>
+    <div class="card-desc">Rate each area of the app this week</div>
+
+    <div class="rating-group">
+      <div class="rating-label">📅 Plan tab</div>
+      <div class="stars" id="stars-plan" data-rating="0" data-key="plan">
+        <div class="star" onclick="setRating('plan',1)">★</div>
+        <div class="star" onclick="setRating('plan',2)">★</div>
+        <div class="star" onclick="setRating('plan',3)">★</div>
+        <div class="star" onclick="setRating('plan',4)">★</div>
+        <div class="star" onclick="setRating('plan',5)">★</div>
+      </div>
+    </div>
+
+    <div class="rating-group">
+      <div class="rating-label">🛒 Shopping list</div>
+      <div class="stars" id="stars-shop" data-rating="0" data-key="shop">
+        <div class="star" onclick="setRating('shop',1)">★</div>
+        <div class="star" onclick="setRating('shop',2)">★</div>
+        <div class="star" onclick="setRating('shop',3)">★</div>
+        <div class="star" onclick="setRating('shop',4)">★</div>
+        <div class="star" onclick="setRating('shop',5)">★</div>
+      </div>
+    </div>
+
+    <div class="rating-group">
+      <div class="rating-label">📖 Meal library</div>
+      <div class="stars" id="stars-meals" data-rating="0" data-key="meals">
+        <div class="star" onclick="setRating('meals',1)">★</div>
+        <div class="star" onclick="setRating('meals',2)">★</div>
+        <div class="star" onclick="setRating('meals',3)">★</div>
+        <div class="star" onclick="setRating('meals',4)">★</div>
+        <div class="star" onclick="setRating('meals',5)">★</div>
+      </div>
+    </div>
+
+    <div class="rating-group">
+      <div class="rating-label">🛍 Staples</div>
+      <div class="stars" id="stars-staples" data-rating="0" data-key="staples">
+        <div class="star" onclick="setRating('staples',1)">★</div>
+        <div class="star" onclick="setRating('staples',2)">★</div>
+        <div class="star" onclick="setRating('staples',3)">★</div>
+        <div class="star" onclick="setRating('staples',4)">★</div>
+        <div class="star" onclick="setRating('staples',5)">★</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Free text -->
+  <div class="card">
+    <div class="card-title">Your notes</div>
+    <div class="card-desc">Anything else — bugs, ideas, things that surprised you</div>
+
+    <div class="field">
+      <label>What would you change or add?</label>
+      <textarea id="text-change" placeholder="e.g. I'd love to be able to…" rows="3"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Any bugs or things that didn't work?</label>
+      <textarea id="text-bugs" placeholder="e.g. When I tried to…" rows="3"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Best thing this week</label>
+      <input type="text" id="text-best" placeholder="e.g. The shopping list was so quick to generate">
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-row">
+    <span class="save-indicator" id="save-indicator">✓ Saved</span>
+    <button class="btn-export" onclick="exportFeedback()">Export all feedback</button>
+    <button class="btn-submit" onclick="saveFeedback()">Save this week's feedback</button>
+  </div>
+
+  <!-- History -->
+  <div class="history-section">
+    <div class="history-title">Previous weeks</div>
+    <div id="history-list"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──
+let currentWeekOffset = 0;
+const STORAGE_KEY = 'ps_feedback';
+
+function getWeekStart(offset = 0) {
+  const d = new Date();
+  const day = d.getDay(); // 0=Sun
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Mon
+  const mon = new Date(d.setDate(diff + offset * 7));
+  mon.setHours(0,0,0,0);
+  return mon;
+}
+
+function formatWeekLabel(date) {
+  const end = new Date(date); end.setDate(end.getDate() + 6);
+  const opts = { day: 'numeric', month: 'short' };
+  return `${date.toLocaleDateString('en-GB', opts)} – ${end.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}`;
+}
+
+function weekKey(date) {
+  return date.toISOString().slice(0,10);
+}
+
+function getAllFeedback() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+}
+
+function getFeedbackForWeek(key) {
+  return getAllFeedback()[key] || {};
+}
+
+// ── WEEK NAV ──
+function changeWeek(dir) {
+  if (dir === 0) { currentWeekOffset = 0; }
+  else { currentWeekOffset += dir; }
+  loadWeek();
+}
+
+function loadWeek() {
+  const weekStart = getWeekStart(currentWeekOffset);
+  const key = weekKey(weekStart);
+  document.getElementById('week-label').textContent = formatWeekLabel(weekStart);
+
+  const saved = getFeedbackForWeek(key);
+
+  // Ratings
+  ['overall','plan','shop','meals','staples'].forEach(k => {
+    setRatingDisplay(k, saved.ratings?.[k] || 0);
+  });
+
+  // Chips
+  document.querySelectorAll('#chips-worked .chip').forEach(c => {
+    c.classList.toggle('selected', (saved.worked || []).includes(c.textContent));
+  });
+  document.querySelectorAll('#chips-improve .chip').forEach(c => {
+    c.classList.toggle('selected', (saved.improve || []).includes(c.textContent));
+  });
+
+  // Text
+  document.getElementById('text-change').value = saved.textChange || '';
+  document.getElementById('text-bugs').value   = saved.textBugs   || '';
+  document.getElementById('text-best').value   = saved.textBest   || '';
+
+  updateReminder();
+  renderHistory();
+}
+
+// ── RATINGS ──
+function setRating(key, val) {
+  setRatingDisplay(key, val);
+}
+
+function setRatingDisplay(key, val) {
+  const el = document.getElementById('stars-' + key);
+  if (!el) return;
+  el.dataset.rating = val;
+  el.querySelectorAll('.star').forEach((s, i) => {
+    s.classList.toggle('active', i < val);
+  });
+}
+
+// ── CHIPS ──
+function toggleChip(el) {
+  el.classList.toggle('selected');
+}
+
+// ── REMINDER ──
+function updateReminder() {
+  const banner = document.getElementById('reminder-banner');
+  const text   = document.getElementById('reminder-text');
+  const dayEl  = document.getElementById('reminder-day');
+  const now    = new Date();
+  const day    = now.getDay(); // 0=Sun,4=Thu,5=Fri
+  const hour   = now.getHours();
+
+  if (day === 4 && hour >= 18) {
+    text.textContent = '⏰ Thursday evening — perfect time to log this week\'s feedback';
+    dayEl.textContent = 'Thursday reminder';
+    banner.style.borderLeftColor = 'var(--terra-400)';
+    banner.style.background = 'var(--terra-50, #FBF0EC)';
+  } else if (day === 5 && hour < 12) {
+    text.textContent = '⏰ Friday morning — spend 5 minutes capturing this week\'s thoughts';
+    dayEl.textContent = 'Friday reminder';
+    banner.style.borderLeftColor = 'var(--terra-400)';
+    banner.style.background = 'var(--terra-50, #FBF0EC)';
+  } else {
+    const daysUntil = day <= 4 ? 4 - day : 4 + (7 - day);
+    text.textContent = `Next reminder on Thursday evening — ${daysUntil === 0 ? 'today!' : `in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`}`;
+    dayEl.textContent = now.toLocaleDateString('en-GB', { weekday:'long' });
+  }
+}
+
+// ── SAVE ──
+function saveFeedback() {
+  const weekStart = getWeekStart(currentWeekOffset);
+  const key = weekKey(weekStart);
+  const all = getAllFeedback();
+
+  all[key] = {
+    week:   formatWeekLabel(weekStart),
+    saved:  new Date().toISOString(),
+    ratings: {
+      overall: parseInt(document.getElementById('stars-overall').dataset.rating) || 0,
+      plan:    parseInt(document.getElementById('stars-plan').dataset.rating)    || 0,
+      shop:    parseInt(document.getElementById('stars-shop').dataset.rating)    || 0,
+      meals:   parseInt(document.getElementById('stars-meals').dataset.rating)   || 0,
+      staples: parseInt(document.getElementById('stars-staples').dataset.rating) || 0,
+    },
+    worked:     [...document.querySelectorAll('#chips-worked .chip.selected')].map(c => c.textContent),
+    improve:    [...document.querySelectorAll('#chips-improve .chip.selected')].map(c => c.textContent),
+    textChange: document.getElementById('text-change').value.trim(),
+    textBugs:   document.getElementById('text-bugs').value.trim(),
+    textBest:   document.getElementById('text-best').value.trim(),
+  };
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+
+  const ind = document.getElementById('save-indicator');
+  ind.classList.add('show');
+  setTimeout(() => ind.classList.remove('show'), 2500);
+
+  showToast('Feedback saved ✓');
+  renderHistory();
+}
+
+// ── EXPORT ──
+function exportFeedback() {
+  const all = getAllFeedback();
+  if (!Object.keys(all).length) { showToast('No feedback saved yet'); return; }
+
+  let out = 'PLAN & SHOP — FEEDBACK LOG\n';
+  out += 'Exported: ' + new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + '\n';
+  out += '═'.repeat(50) + '\n\n';
+
+  Object.entries(all).sort((a,b) => b[0].localeCompare(a[0])).forEach(([, f]) => {
+    out += `WEEK: ${f.week}\n`;
+    out += `Saved: ${new Date(f.saved).toLocaleDateString('en-GB')}\n\n`;
+    if (f.ratings) {
+      out += 'Ratings (out of 5):\n';
+      out += `  Overall: ${'★'.repeat(f.ratings.overall)}${'☆'.repeat(5-f.ratings.overall)} (${f.ratings.overall})\n`;
+      out += `  Plan tab: ${'★'.repeat(f.ratings.plan)}${'☆'.repeat(5-f.ratings.plan)} (${f.ratings.plan})\n`;
+      out += `  Shopping: ${'★'.repeat(f.ratings.shop)}${'☆'.repeat(5-f.ratings.shop)} (${f.ratings.shop})\n`;
+      out += `  Meals: ${'★'.repeat(f.ratings.meals)}${'☆'.repeat(5-f.ratings.meals)} (${f.ratings.meals})\n`;
+      out += `  Staples: ${'★'.repeat(f.ratings.staples)}${'☆'.repeat(5-f.ratings.staples)} (${f.ratings.staples})\n\n`;
+    }
+    if (f.worked?.length)  out += `Worked well: ${f.worked.join(', ')}\n`;
+    if (f.improve?.length) out += `Needs improvement: ${f.improve.join(', ')}\n`;
+    if (f.textBest)   out += `Best thing: ${f.textBest}\n`;
+    if (f.textChange) out += `Would change: ${f.textChange}\n`;
+    if (f.textBugs)   out += `Bugs/issues: ${f.textBugs}\n`;
+    out += '\n' + '─'.repeat(50) + '\n\n';
+  });
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(out).then(() => {
+    showToast('Copied to clipboard — paste into Claude for analysis');
+  }).catch(() => {
+    // Fallback: show in a new window
+    const w = window.open('', '_blank');
+    w.document.write('<pre style="font-family:monospace;padding:20px;white-space:pre-wrap">' + out + '</pre>');
+    showToast('Opened in new tab');
+  });
+}
+
+// ── HISTORY ──
+function renderHistory() {
+  const all = getAllFeedback();
+  const el  = document.getElementById('history-list');
+  const entries = Object.entries(all).sort((a,b) => b[0].localeCompare(a[0]));
+
+  if (!entries.length) {
+    el.innerHTML = '<div class="no-history">No feedback saved yet — complete your first week and hit Save</div>';
+    return;
+  }
+
+  el.innerHTML = entries.map(([key, f]) => {
+    const rating = f.ratings?.overall || 0;
+    const dots = [1,2,3,4,5].map(i =>
+      `<div class="h-dot ${i <= rating ? '' : 'empty'}"></div>`
+    ).join('');
+    return `
+      <div class="history-card" onclick="loadHistoryWeek('${key}')">
+        <div>
+          <div class="history-week">${f.week}</div>
+          <div class="history-date">Saved ${new Date(f.saved).toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</div>
+        </div>
+        <div class="history-dots">${dots}</div>
+        <div class="history-overall">${rating}/5</div>
+      </div>`;
+  }).join('');
+}
+
+function loadHistoryWeek(key) {
+  // Find the offset for this week
+  const target = new Date(key);
+  const current = getWeekStart(0);
+  const diff = Math.round((target - current) / (7 * 24 * 60 * 60 * 1000));
+  currentWeekOffset = diff;
+  loadWeek();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── INIT ──
+loadWeek();
+</script>
+</body>
+</html>
