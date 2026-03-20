@@ -573,6 +573,7 @@
         <button class="btn btn-ghost btn-sm" onclick="suggestWeek()" style="color:var(--forest-600);border-color:var(--forest-100);background:var(--forest-50)">Suggest week</button>
         <button class="btn btn-ghost btn-sm" onclick="copyLastWeek()" style="color:var(--forest-600);border-color:var(--forest-100);background:var(--forest-50)">Copy last week</button>
         <button class="btn btn-ghost btn-sm" onclick="showTemplatesPanel()" style="color:var(--forest-600);border-color:var(--forest-100);background:var(--forest-50)">Day templates</button>
+        <button class="btn btn-ghost btn-sm" onclick="printPlanner()">Print plan</button>
         <button class="btn btn-ghost btn-sm" onclick="clearWeek()" style="color:var(--ink-3)">Clear week</button>
       </div>
     </div>
@@ -3756,6 +3757,49 @@ function renderExtras() {
   ).join('');
 }
 
+function printPlanner() {
+  try {
+    var rows = '';
+    DAYS.forEach(function(day) {
+      var cells = '';
+      MEAL_TYPES.forEach(function(mtype) {
+        var id = weekPlan[day] && weekPlan[day][mtype];
+        var meal = id ? meals.find(function(m){ return m.id == id; }) : null;
+        cells += '<td style="padding:6px 8px;border:1px solid #ccc;font-size:9pt;vertical-align:top">' + (meal ? meal.name : '<span style="color:#ccc">—</span>') + '</td>';
+      });
+      rows += '<tr><td style="padding:6px 8px;border:1px solid #ccc;font-weight:bold;font-size:9pt;background:#f9f6f0;white-space:nowrap">' + day + '</td>' + cells + '</tr>';
+    });
+
+    var printHTML = '<!DOCTYPE html><html><head><title>Meal Plan</title><style>'
+      + 'body{font-family:Georgia,serif;margin:1cm;font-size:10pt;color:#1a1917}'
+      + 'h2{color:#1e4018;font-size:14pt;margin-bottom:4px;font-weight:normal}'
+      + 'p{color:#888;font-size:8pt;margin-bottom:14px}'
+      + 'table{width:100%;border-collapse:collapse}'
+      + 'th{background:#1e4018;color:white;padding:7px 8px;text-align:left;font-size:8pt;text-transform:uppercase;letter-spacing:0.5px}'
+      + '@media print{@page{size:landscape;margin:1cm}}'
+      + '</style></head><body>'
+      + '<h2>Plan &amp; Shop — Weekly Meal Plan</h2>'
+      + '<p>' + new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'}) + '</p>'
+      + '<table><thead><tr>'
+      + '<th style="width:10%">Day</th>'
+      + '<th>Breakfast</th><th>Lunch</th><th>Dinner</th><th>Snack</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table>'
+      + '<scr' + 'ipt>window.onload=function(){window.print();}<\/scr' + 'ipt>'
+      + '</body></html>';
+
+    var blob = new Blob([printHTML], {type:'text/html'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    setTimeout(function(){ a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+  } catch(e) {
+    showToast('Print error: ' + e.message);
+  }
+}
+
+
 function printShoppingList() {
   const byAisle = {};
   document.querySelectorAll('.shop-category').forEach(cat => {
@@ -3783,16 +3827,34 @@ function printShoppingList() {
         </div>`).join('')}
     </div>`).join('');
 
-  // Inject a print-only sheet into the current document
-  let sheet = document.getElementById('print-sheet');
-  if (!sheet) {
-    sheet = document.createElement('div');
-    sheet.id = 'print-sheet';
-    document.body.appendChild(sheet);
-  }
-  sheet.innerHTML = `<div class="ptitle">Shopping List &nbsp;·&nbsp; ${date} &nbsp;·&nbsp; ${totalItems} items</div><div class="pcols">${blocks}</div>`;
+  const printHTML = '<!DOCTYPE html><html><head><title>Shopping List</title><style>'
+    + 'body{font-family:Georgia,serif;margin:1cm;font-size:9pt;color:#1a1917}'
+    + 'h2{color:#1e4018;font-size:14pt;margin-bottom:4px}'
+    + 'p{color:#888;font-size:8pt;margin-bottom:14px}'
+    + '.pcols{column-count:4;column-gap:16px;column-rule:1px solid #ddd}'
+    + '.paisle{break-inside:avoid;margin-bottom:10px}'
+    + '.paisle-name{font-size:7pt;font-weight:bold;text-transform:uppercase;letter-spacing:0.8px;color:#3a6b30;border-bottom:1px solid #3a6b30;padding-bottom:2px;margin-bottom:4px}'
+    + '.prow{display:flex;align-items:baseline;gap:4px;padding:2px 0;border-bottom:0.5px solid #ede3cc}'
+    + '.ptick{width:9px;height:9px;border:1px solid #999;display:inline-block;flex-shrink:0}'
+    + '.pname{flex:1}.pqty{color:#3a6b30;font-weight:600;white-space:nowrap}'
+    + '@media print{@page{size:landscape;margin:1cm}}'
+    + '</style></head><body>'
+    + '<h2>Shopping List</h2><p>' + date + ' &nbsp;·&nbsp; ' + totalItems + ' items</p>'
+    + '<div class="pcols">' + blocks + '</div>'
+    + '<script>window.onload=function(){window.print();}<\/script>'
+    + '</body></html>';
 
-  window.print();
+  try {
+    const blob = new Blob([printHTML], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    setTimeout(function(){ a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+  } catch(e) {
+    showToast('Could not open print window');
+  }
 }
 
 
